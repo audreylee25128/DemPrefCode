@@ -1,4 +1,5 @@
-from gym.envs.registration import registry, register, make, spec
+# from gym.envs.registration import registry, register, make, spec
+from gymDomain.gym.envs.registration import registry, register, make, spec
 
 # Algorithmic
 # ----------------------------------------

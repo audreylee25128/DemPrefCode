@@ -1,7 +1,7 @@
 import numpy as np
 
-from gym import utils
-from gym.envs.robotics import fetch_env
+from gymDomain.gym import utils
+from gymDomain.gym.envs.robotics import fetch_env
 
 
 class FetchSlideEnv(fetch_env.FetchEnv, utils.EzPickle):

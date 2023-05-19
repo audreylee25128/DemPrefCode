@@ -2,8 +2,12 @@ import itertools, time, typing
 
 import numpy as np
 import scipy.optimize as opt
-import theano
-import theano.tensor as tt
+# import theano
+# import theano.tensor as tt
+# import aesara as th
+# import aesara.tensor as tt
+import pytensor
+import pytensor.tensor as tt
 
 import domain
 import traj

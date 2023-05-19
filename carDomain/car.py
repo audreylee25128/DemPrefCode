@@ -1,7 +1,11 @@
 import numpy as np
 import utils as utils
-import theano as th
-import theano.tensor as tt
+# import theano as th
+# import theano.tensor as tt
+# import aesara as th
+# import aesara.tensor as tt
+import pytensor as th
+import pytensor.tensor as tt
 from carDomain.trajectory import Trajectory
 import carDomain.feature as feature
 

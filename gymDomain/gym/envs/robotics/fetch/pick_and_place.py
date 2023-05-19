@@ -1,5 +1,5 @@
-from gym import utils
-from gym.envs.robotics import fetch_env
+from gymDomain.gym import utils
+from gymDomain.gym.envs.robotics import fetch_env
 
 
 class FetchPickAndPlaceEnv(fetch_env.FetchEnv, utils.EzPickle):

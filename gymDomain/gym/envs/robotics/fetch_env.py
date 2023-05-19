@@ -1,6 +1,6 @@
 import numpy as np
 
-from gym.envs.robotics import rotations, robot_env, utils
+from gymDomain.gym.envs.robotics import rotations, robot_env, utils
 
 
 def goal_distance(goal_a, goal_b):

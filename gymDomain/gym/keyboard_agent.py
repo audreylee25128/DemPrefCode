@@ -1,8 +1,13 @@
 #!/usr/bin/env python
 from __future__ import print_function
 
-import sys, gym, time
+# import gymnasium as gym
+import gymDomain.gym as gym
+from gymDomain.gym.envs.box2d.lunar_lander import LunarLander
+# import sys, gym, time
+import sys, time
 import pickle
+
 
 #
 # Test yourself as a learning agent! Pass environment name as a command-line argument, for example:
@@ -10,7 +15,8 @@ import pickle
 # python keyboard_agent.py SpaceInvadersNoFrameskip-v4
 #
 
-env = gym.make('LunarLander-v2')
+# env = gym.make('LunarLander-v2')
+env = LunarLander()
 
 if not hasattr(env.action_space, 'n'):
     raise Exception('Keyboard agent only supports discrete action spaces')

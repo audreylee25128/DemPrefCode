@@ -2,11 +2,13 @@ import os
 import copy
 import numpy as np
 
-import gym
-from gym import error, spaces
-from gym.utils import seeding
+import gymDomain.gym as gym
+from gymDomain.gym import error, spaces
+from gymDomain.gym.utils import seeding
 
 try:
+    # import mujoco_py
+    import mujoco
     import mujoco_py
 except ImportError as e:
     raise error.DependencyNotInstalled("{}. (HINT: you need to install mujoco_py, and also perform the setup instructions here: https://github.com/openai/mujoco-py/.)".format(e))
@@ -22,6 +24,7 @@ class RobotEnv(gym.GoalEnv):
             raise IOError('File {} does not exist'.format(fullpath))
 
         model = mujoco_py.load_model_from_path(fullpath)
+        # model = mujoco.MjModel.from_xml_path(fullpath)
         self.sim = mujoco_py.MjSim(model, nsubsteps=n_substeps)
         self.viewer = None
 

@@ -1,8 +1,8 @@
 import numpy as np
 
-from gym import utils
-from gym.envs.robotics import hand_env
-from gym.envs.robotics.utils import robot_get_obs
+from gymDomain.gym import utils
+from gymDomain.gym.envs.robotics import hand_env
+from gymDomain.gym.envs.robotics.utils import robot_get_obs
 
 
 FINGERTIP_SITE_NAMES = [

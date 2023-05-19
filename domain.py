@@ -3,11 +3,16 @@ import math
 import time
 import typing
 
-import gym
+import gymDomain.gym as gym
+# import gymnasium as gym
 import numpy as np
 import scipy.optimize as opt
-import theano as th
-import theano.tensor as tt
+# import theano as th
+# import theano.tensor as tt
+# import aesara as th
+# import aesara.tensor as tt
+import pytensor as th
+import pytensor.tensor as tt
 
 import carDomain.car as car
 import carDomain.dynamics as dynamics
@@ -15,8 +20,12 @@ import carDomain.lane as lane
 import carDomain.world as world
 import carDomain.visualize as visualize
 
-import gym.keyboard_agent as keyboard_agent
-import gym.envs.robotics.utils as fetch_utils
+import gymDomain.gym.envs.robotics.utils as fetch_utils
+import gymDomain.gym.keyboard_agent as keyboard_agent
+# import gym.keyboard_agent as keyboard_agent
+# import gymnasium.keyboard_agent as keyboard_agent
+# import gymnasium.envs.robotics.utils as fetch_utils
+
 
 import traj as traj
 import utils
@@ -158,7 +167,8 @@ class Gym(Domain):
         :param control_size: Needed for Fetch integration. For non-Fetch environments, leave blank.
         :param control_bounds: Needed for Fetch integration. For non-Fetch environments, leave blank.
         """
-        self.env = gym.make(name)
+        # self.env = gym.make(name)
+        self.env = gym.envs.robotics.fetch.reach.FetchReachEnv()
         self.seed = seed
         self.env.seed(self.seed)
 

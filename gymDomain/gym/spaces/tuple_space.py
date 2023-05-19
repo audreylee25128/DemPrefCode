@@ -1,4 +1,4 @@
-import gym
+import gymDomain.gym as gym
 
 class Tuple(gym.Space):
     """

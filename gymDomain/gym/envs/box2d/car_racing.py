@@ -4,10 +4,10 @@ import numpy as np
 import Box2D
 from Box2D.b2 import (edgeShape, circleShape, fixtureDef, polygonShape, revoluteJointDef, contactListener)
 
-import gym
-from gym import spaces
-from gym.envs.box2d.car_dynamics import Car
-from gym.utils import colorize, seeding, EzPickle
+import gymDomain.gym as gym
+from gymDomain.gym import spaces
+from gymDomain.gym.envs.box2d.car_dynamics import Car
+from gymDomain.gym.utils import colorize, seeding, EzPickle
 
 import pyglet
 from pyglet import gl

@@ -1,4 +1,4 @@
-import gym
+import gymDomain.gym as gym
 from collections import OrderedDict
 
 class Dict(gym.Space):

@@ -1,5 +1,5 @@
 import numpy as np
-import gym
+import gymDomain.gym as gym
 
 class Discrete(gym.Space):
     """

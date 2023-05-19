@@ -1,5 +1,5 @@
 import re
-from gym import error, logger
+from gymDomain.gym import error, logger
 
 # This format is true today, but it's *not* an official spec.
 # [username/](env-name)-v(version)    env-name is group 1, version is group 2

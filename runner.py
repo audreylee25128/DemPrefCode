@@ -1,3 +1,6 @@
+# import os
+# os.environ['OMP_NUM_THREADS'] = '1'
+
 import time
 from typing import Tuple, List
 import sys
@@ -11,6 +14,8 @@ import human
 import query_generation
 import sampling
 import traj
+
+# import runpy
 
 class Runner(object):
     def __init__(self, domain: domain.Domain, human_type: str,
@@ -78,6 +83,8 @@ class Runner(object):
                        self.n_samples_summ, self.n_samples_exp, self.true_weight, self.beta_demo, self.beta_pref,
                        self.beta_human]
 
+        print("Initialized Runner!")
+
     def run(self, n_iters:int=1) -> Tuple[pd.DataFrame, List]:
         """
         Runs the algorithm n_iters times and returns a data frame with all the data from the experiment.
@@ -115,21 +122,26 @@ class Runner(object):
                                                        generate_scenario=self.gen_scenario, update_func=self.update_func,
                                                        beta_pref=self.beta_pref)
 
+
         ### Creating human
         humans = {
             "opt": human.OptimalHuman(self.domain, self.update_func, self.true_weight),
             "btz": human.BoltzmannHuman(self.domain, self.update_func, self.true_weight, self.beta_human),
             "term": human.TerminalHuman(self.domain, self.update_func)
         }
+
         H = humans[self.human_type]
 
 
         ### Iterating to build confidence intervals
         for i in range(n_iters):
             ### Processing demonstrations
-            sampler = sampling.Sampler(n_query=self.n_query, dim_features=self.domain.feature_size,
-                                       update_func=self.update_func,
-                                       beta_demo=self.beta_demo, beta_pref=self.beta_pref)
+            # sampler = sampling.Sampler(n_query=self.n_query, dim_features=self.domain.feature_size,
+            #                            update_func=self.update_func,
+            #                            beta_demo=self.beta_demo, beta_pref=self.beta_pref)
+            sampler = sampling.Sampler(n_query=2, dim_features=3, update_func="approx", beta_demo=0.1, beta_pref=5.) # debug use
+            print("Successfully initialized sampler")
+
             if self.n_demos > 0:
                 if self.gen_demos:
                     self.demos = [self.domain.simulate(self.true_weight, iter_count=self.sim_iter_count) for _ in range(self.n_demos)]
@@ -142,10 +154,21 @@ class Runner(object):
                 if self.inc_prev_query:
                     last_query_picked = [d for d in cleaned_demos]
             else:
+                print("In this loop")
                 last_query_picked = [traj.Trajectory(states=None, controls=None, null=True)]
 
             ## Computing initial estimates
-            samples = sampler.sample(N=self.n_samples_summ)
+            # print(type(self.n_samples_summ))
+            print(self.n_samples_summ)
+            print(self.update_func)
+            print(self.domain.feature_size)
+
+            # samples = sampler.sample(N=self.n_samples_summ)
+            samples = sampler.sample(N=50000) # debug use
+            # samples = runpy.run_module(mod_name="sampling", init_globals={}, run_name="__main__") # debug use
+            print("SAMPLES OK")
+
+
             mean_w = np.mean(samples, axis=0)
             mean_w = mean_w / np.linalg.norm(mean_w)
             var_w = np.var(samples, axis=0)
@@ -160,7 +183,9 @@ class Runner(object):
                      samples])
                 data.append([i+1, 0, "m", m])
                 print("Estimate of m: " + str(m) + "\n\n")
-            df = df.append(pd.DataFrame(data, columns=["run #", "pref_iter", "type", "value"]), ignore_index=True)
+            # temp_df = pd.DataFrame(data, columns=["run #", "pref_iter", "type", "value"])
+            # df = df.append(df2, ignore_index=True) 
+            df = pd.concat([df, pd.DataFrame(data, columns=["run #", "pref_iter", "type", "value"])], ignore_index=True)
 
             ### Preferences loop
             for j in range(self.n_pref_iters):
@@ -225,7 +250,10 @@ class Runner(object):
                          samples])
                     data.append([i+1, j+1, "m", m])
                     print("Estimate of m: " + str(m) + "\n\n")
-                df = df.append(pd.DataFrame(data, columns=["run #", "pref_iter", "type", "value"]), ignore_index=True)
+                
+                # df = df.append(pd.DataFrame(data, columns=["run #", "pref_iter", "type", "value"]), ignore_index=True)
+                df = pd.concat([df, pd.DataFrame(data, columns=["run #", "pref_iter", "type", "value"])], ignore_index=True)
+                print("DATAFRAME: ", df)
             ## Resetting for next run
             sampler.clear_pref()
             if self.inc_prev_query and self.n_demos > 0:
@@ -234,46 +262,91 @@ class Runner(object):
         return df, self.config
 
 
+# Audrey adding for debug
+
+
+# End debug
+
 if __name__ == "__main__":
+
+    # print("HELLO WORLD")
+
     ### COLLECTING AND PROCESSING DEMONSTRATIONS
-    dom = domain.Car(dt=0.1, time_steps=50, num_others=1)
-    # dom = domain.LunarLander(time_steps=200, seed=0)
-    # dom = domain.FetchMove(time_steps=240)
+    # dom = domain.Car(dt=0.1, time_steps=50, num_others=1)
+    # # dom = domain.LunarLander(time_steps=200, seed=0)
+    # # dom = domain.FetchMove(time_steps=240)
 
-    if isinstance(dom, domain.Car):
-        DEMO_WORLD, DEMO_FIXED_CTRL = dom.world_0()
-        demo_names = ["andy-a"]
-        TRIM_START = 15
-        TRUE_WEIGHT = [-0.9, -0.2, 0.9, 0.05]
-    else:
-        demo_names = ["pipelines/fetch/gleb_demo_1"]
-        TRIM_START = 0
-        TRUE_WEIGHT = [-0.9, -0.2, 0.9, 0.05]
-    TRUE_WEIGHT /= np.linalg.norm(TRUE_WEIGHT)
+    # if isinstance(dom, domain.Car):
+    #     DEMO_WORLD, DEMO_FIXED_CTRL = dom.world_0()
+    #     demo_names = ["andy-a"]
+    #     TRIM_START = 15
+    #     TRUE_WEIGHT = [-0.9, -0.2, 0.9, 0.05]
+    # else:
+    #     demo_names = ["pipelines/fetch/gleb_demo_1"]
+    #     TRIM_START = 0
+    #     TRUE_WEIGHT = [-0.9, -0.2, 0.9, 0.05]
+    # TRUE_WEIGHT /= np.linalg.norm(TRUE_WEIGHT)
 
-    ### SETTING PARAMETERS OF ALGORITHM
+    # ### SETTING PARAMETERS OF ALGORITHM
+    # HUMAN_TYPE = "opt"
+
+    # N_DEMOS = 1
+    # GEN_DEMOS = True
+    # SIM_ITER_COUNT = 100
+    # demos = []
+    # if N_DEMOS and not GEN_DEMOS:
+    #     for d in demo_names:
+    #         demo = pickle.load(open(str(d) + ".pickle", 'rb'), encoding='bytes')
+    #         demos.append(demo)
+
+    # N_QUERY = 2
+    # UPDATE_FUNC = "pick_best"
+    # QUERY_LENGTH = 3
+    # INC_PREV_QUERY = False
+    # if isinstance(dom, domain.Car):
+    #     GEN_SCENARIO = True
+    # else:
+    #     GEN_SCENARIO = False
+    # N_PREF_ITERS = 25
+    # EPSILON = 0
+
+    # N_SAMPLES_SUMM = 50000
+    # N_SAMPLES_EXP = N_SAMPLES_SUMM
+
+    # BETA_DEMO = 0.1
+    # BETA_PREF = 5
+    # BETA_HUMAN = 1
+
+    # ### STANDARD RUNNER CALL
+    # runner = Runner(dom, HUMAN_TYPE,
+    #                 N_DEMOS, GEN_DEMOS, SIM_ITER_COUNT, demos, TRIM_START,
+    #                 N_QUERY, UPDATE_FUNC, QUERY_LENGTH, INC_PREV_QUERY, GEN_SCENARIO, N_PREF_ITERS, EPSILON,
+    #                 N_SAMPLES_SUMM, N_SAMPLES_EXP,
+    #                 TRUE_WEIGHT, BETA_DEMO, BETA_PREF, BETA_HUMAN)
+    # df, config = runner.run(n_iters=1)
+
+    # # name = "exp_results/dempref=" + str(DEMPREF) + ",b_demo,b_pref=" + str(BETA_DEMO) + "," + str(BETA_PREF)
+    # name = "fetch_exp" + str(time.time())
+    # with open(name + "_db.pickle", 'wb') as f:
+    #     pickle.dump(df, f)
+    # with open(name + "_config.pickle", 'wb') as f:
+    #     pickle.dump(config, f)
+
+
+    # # Audrey's debug
+    # sampler = sampling.Sampler(n_query=2, dim_features=3, update_func="approx",beta_demo=0.1, beta_pref=5.)
+    # s = sampler.sample(50000)
+
     HUMAN_TYPE = "opt"
 
-    N_DEMOS = 1
-    GEN_DEMOS = True
     SIM_ITER_COUNT = 100
-    demos = []
-    if N_DEMOS and not GEN_DEMOS:
-        for d in demo_names:
-            demo = pickle.load(open(str(d) + ".pickle", 'rb'), encoding='bytes')
-            demos.append(demo)
+    N_PREF_ITERS = 25
+    N_ITERS_EXP = 8
 
     N_QUERY = 2
-    UPDATE_FUNC = "pick_best"
-    QUERY_LENGTH = 3
     INC_PREV_QUERY = False
-    if isinstance(dom, domain.Car):
-        GEN_SCENARIO = True
-    else:
-        GEN_SCENARIO = False
-    N_PREF_ITERS = 25
+    UPDATE_FUNC = "approx"
     EPSILON = 0
-
     N_SAMPLES_SUMM = 50000
     N_SAMPLES_EXP = N_SAMPLES_SUMM
 
@@ -281,18 +354,22 @@ if __name__ == "__main__":
     BETA_PREF = 5
     BETA_HUMAN = 1
 
-    ### STANDARD RUNNER CALL
-    runner = Runner(dom, HUMAN_TYPE,
-                    N_DEMOS, GEN_DEMOS, SIM_ITER_COUNT, demos, TRIM_START,
-                    N_QUERY, UPDATE_FUNC, QUERY_LENGTH, INC_PREV_QUERY, GEN_SCENARIO, N_PREF_ITERS, EPSILON,
-                    N_SAMPLES_SUMM, N_SAMPLES_EXP,
-                    TRUE_WEIGHT, BETA_DEMO, BETA_PREF, BETA_HUMAN)
-    df, config = runner.run(n_iters=1)
+    gen_scenario = False
+    trim_start=0
+    n_demos=0
+    dom = domain.FetchMove(time_steps=150)
+    true_weight = [-0.6, -0.3, 0.9]
+    gen_demos = False
+    D = "fetch_move"
+    demos = [pickle.load(open(f"experiments/main_experiment/fetch_demos/{D}.pickle", 'rb'), encoding='bytes')]
+    query_length = 5
+    r = Runner(dom, HUMAN_TYPE,
+                n_demos, gen_demos, SIM_ITER_COUNT, demos, trim_start,
+                N_QUERY, UPDATE_FUNC, query_length, INC_PREV_QUERY, gen_scenario, N_PREF_ITERS, EPSILON,
+                N_SAMPLES_SUMM, N_SAMPLES_EXP, true_weight, BETA_DEMO, BETA_PREF, BETA_HUMAN)
 
-    # name = "exp_results/dempref=" + str(DEMPREF) + ",b_demo,b_pref=" + str(BETA_DEMO) + "," + str(BETA_PREF)
-    name = "fetch_exp" + str(time.time())
-    with open(name + "_db.pickle", 'wb') as f:
-        pickle.dump(df, f)
-    with open(name + "_config.pickle", 'wb') as f:
-        pickle.dump(config, f)
+    x,y = r.run(n_iters=N_ITERS_EXP)
+    print(type(x))
+    print(type(y))
+    print("Done!")
 

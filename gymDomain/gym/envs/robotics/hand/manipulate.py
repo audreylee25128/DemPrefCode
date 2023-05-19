@@ -1,11 +1,12 @@
 import numpy as np
 
-from gym import utils, error
-from gym.envs.robotics import rotations, hand_env
-from gym.envs.robotics.utils import robot_get_obs
+from gymDomain.gym import utils, error
+from gymDomain.gym.envs.robotics import rotations, hand_env
+from gymDomain.gym.envs.robotics.utils import robot_get_obs
 
 try:
-    import mujoco_py
+    # import mujoco_py
+    import mujoco
 except ImportError as e:
     raise error.DependencyNotInstalled("{}. (HINT: you need to install mujoco_py, and also perform the setup instructions here: https://github.com/openai/mujoco-py/.)".format(e))
 

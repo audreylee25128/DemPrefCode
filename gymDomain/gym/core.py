@@ -1,8 +1,12 @@
-from gym import logger
+from gymDomain.gym import logger
 
-import gym
-from gym import error
-from gym.utils import closer
+# import gym
+# from gym import error
+# from gym.utils import closer
+
+import gymDomain.gym as gym
+from gymDomain.gym import error
+from gymDomain.gym.utils import closer
 
 env_closer = closer.Closer()
 

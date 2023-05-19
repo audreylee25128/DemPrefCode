@@ -1,4 +1,4 @@
-import gym
+import gymDomain.gym as gym
 import numpy as np
 
 class MultiDiscrete(gym.Space):

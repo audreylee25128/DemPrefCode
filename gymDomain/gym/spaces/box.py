@@ -1,6 +1,6 @@
 import numpy as np
-import gym
-from gym import logger
+import gymDomain.gym as gym
+from gymDomain.gym import logger
 
 class Box(gym.Space):
     """

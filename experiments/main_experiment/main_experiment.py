@@ -29,8 +29,8 @@ BETA_HUMAN = 1
 def main_experiment(dom: domain.Domain, true_weight: typing.List, gen_demos: bool, demos: typing.List, query_length: int, name: str):
     """
     Runs a full factorial experiment on {dempref, non-dempref} and {CIA, non-CIA} in simulation. Saves the data to a
-    file locally.
-
+    file locally
+.
     :param dom: the domain on which to run the experiment.
     :param true_weight: reward weight vector for the simulated agent to optimize.
     :param gen_demos: whether to generate demos or use provided demos.
@@ -62,6 +62,7 @@ def main_experiment(dom: domain.Domain, true_weight: typing.List, gen_demos: boo
             df, config = r.run(n_iters=N_ITERS_EXP)
         except:
             errors.append(n)
+            print("ERROR:", n)
 
         with open(n + "_db.pickle", 'wb') as f:
             pickle.dump(df, f)

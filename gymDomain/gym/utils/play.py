@@ -1,4 +1,4 @@
-import gym
+import gymDomain.gym as gym
 import pygame
 import sys
 import time
